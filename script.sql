@@ -90,6 +90,18 @@ CREATE TABLE user_blocks (
                              FOREIGN KEY (BLOCKED_ID) REFERENCES users(ID) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+                                              ID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                                              USER_ID BIGINT UNSIGNED NOT NULL,
+                                              TOKEN VARCHAR(255) NOT NULL UNIQUE,
+                                              USER_AGENT_HASH VARCHAR(64),
+                                              EXPIRES_AT DATETIME NOT NULL,
+                                              REVOKED_AT DATETIME,
+                                              CREATED_AT DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                              CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (USER_ID) REFERENCES users(ID) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- =============================
 -- 6. COMMUNITY MEMBERS
 -- =============================

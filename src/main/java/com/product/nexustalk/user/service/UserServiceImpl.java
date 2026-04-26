@@ -9,8 +9,13 @@ import com.product.nexustalk.user.exception.UserNotFoundException;
 import com.product.nexustalk.user.repository.UserBlockRepository;
 import com.product.nexustalk.user.repository.UserFollowRepository;
 import com.product.nexustalk.user.repository.UserRepository;
+import jakarta.websocket.Decoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Base64;
 
 @Service
 @Transactional
