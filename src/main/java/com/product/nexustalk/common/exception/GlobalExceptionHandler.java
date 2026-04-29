@@ -1,8 +1,9 @@
 package com.product.nexustalk.common.exception;
 
-import com.product.nexustalk.common.api.ApiError;
+import com.product.nexustalk.common.api.BaseResponse;
 import com.product.nexustalk.auth.exception.InvalidCredentialsException;
 import com.product.nexustalk.auth.exception.InvalidRefreshTokenException;
+import com.product.nexustalk.config.ErrorConf;
 import com.product.nexustalk.user.exception.DuplicateUserException;
 import com.product.nexustalk.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -14,20 +15,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private HttpStatus status;
+
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ApiError> handleUserNotFound(UserNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiError.of("USER_NOT_FOUND", ex.getMessage()));
+    public ResponseEntity<BaseResponse> handleUserNotFound(UserNotFoundException ex) {
+        status = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(status)
+                .body(BaseResponse.of(status.value(), status.getReasonPhrase(),ex.getMessage()));
     }
 
     @ExceptionHandler(DuplicateUserException.class)
-    public ResponseEntity<ApiError> handleDuplicate(DuplicateUserException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiError.of("DUPLICATE_USER", ex.getMessage()));
+    public ResponseEntity<BaseResponse> handleDuplicate(DuplicateUserException ex) {
+        status = HttpStatus.CONFLICT;
+        return ResponseEntity.status(status)
+                .body(BaseResponse.of(status.value(), status.getReasonPhrase(), ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<BaseResponse> handleValidation(MethodArgumentNotValidException ex) {
+        status = HttpStatus.BAD_REQUEST;
         String message = ex.getBindingResult().getAllErrors().stream()
                 .findFirst()
                 .map(err -> {
@@ -38,24 +44,28 @@ public class GlobalExceptionHandler {
                 })
                 .orElse("Validation error");
         return ResponseEntity.badRequest()
-                .body(ApiError.of("VALIDATION_ERROR", message));
+                .body(BaseResponse.of(status.value(), status.getReasonPhrase(), message));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ApiError> handleInvalidCredentials(InvalidCredentialsException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiError.of("INVALID_CREDENTIALS", ex.getMessage()));
+
+    public ResponseEntity<BaseResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+        status = HttpStatus.UNAUTHORIZED;
+        return ResponseEntity.status(status)
+                .body(BaseResponse.of(status.value(), ErrorConf.getInstance().DES_401_INVALID_CREDENTIALS, ex.getMessage()));
     }
 
     @ExceptionHandler(InvalidRefreshTokenException.class)
-    public ResponseEntity<ApiError> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
+    public ResponseEntity<BaseResponse> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
+        status = HttpStatus.UNAUTHORIZED;
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiError.of("INVALID_REFRESH_TOKEN", ex.getMessage()));
+                .body(BaseResponse.of(status.value(), status.getReasonPhrase(), ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleFallback(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiError.of("INTERNAL_ERROR", "Unexpected error"));
+    public ResponseEntity<BaseResponse> handleFallback(Exception ex) {
+        status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(status)
+                .body(BaseResponse.of(status.value(), status.getReasonPhrase(), "Unexpected error"));
     }
 }
