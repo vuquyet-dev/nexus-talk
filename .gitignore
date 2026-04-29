@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Generated when extracting docx for analysis
+.tmp_docx/
+
+# api key setup trong env cua thiet bi
+.env
