@@ -16,6 +16,7 @@ public class Util {
     }
     private Util() {
     }
+    public static final String DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     public UserResponse toUser(User user) {
         return new UserResponse(
