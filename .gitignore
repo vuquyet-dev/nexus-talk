@@ -37,3 +37,6 @@ build/
 
 # api key setup trong env cua thiet bi
 .env
+
+#khong day tai lieu len git
+*.docx
