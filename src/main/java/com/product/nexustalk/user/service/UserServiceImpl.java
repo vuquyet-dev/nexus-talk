@@ -9,6 +9,7 @@ import com.product.nexustalk.user.exception.UserNotFoundException;
 import com.product.nexustalk.user.repository.UserBlockRepository;
 import com.product.nexustalk.user.repository.UserFollowRepository;
 import com.product.nexustalk.user.repository.UserRepository;
+import com.product.nexustalk.util.Util;
 import jakarta.websocket.Decoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        return toResponse(user);
+        return Util.getInstance().toUser(user);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
         if (request.bio() != null) {
             user.setBio(request.bio());
         }
-        return toResponse(user);
+        return Util.getInstance().toUser(user);
     }
 
     @Override
@@ -99,19 +100,5 @@ public class UserServiceImpl implements UserService {
         blockRepository.deleteByBlockerAndBlocked(me, target);
     }
 
-    private static UserResponse toResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getAvatarUrl(),
-                user.getBio(),
-                user.getRole(),
-                user.getStatus(),
-                user.getLastActiveAt(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
-    }
 }
 
